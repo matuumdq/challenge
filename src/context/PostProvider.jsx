@@ -1,5 +1,5 @@
 import axios from "axios";
-import { createContext, useState } from "react";
+import { createContext, useEffect, useState } from "react";
 
 const PostContext = createContext()
 
@@ -7,21 +7,40 @@ const PostProvider = ({children}) => {
 
     const [post, setPost] = useState([])
     const [liked, setLiked] = useState(false)
-    const [postLiked, setPostLiked] = useState([])
+    const [postLiked, setPostLiked] = useState(JSON.parse(localStorage.getItem('likedPost')) || [])
+    const [consult, setConsult] = useState(JSON.parse(localStorage.getItem('consult')) || '')
 
-    const newsConsult = async(value) => {
-        try {
-            if(value==='') return
-    
-            const url = `https://hn.algolia.com/api/v1/search_by_date?query=${value}&page=1`
-            
-            const { data } = await axios(url)
-            setPost(data.hits)
-        
-        } catch (error) {
-            console.log(error.message)
+    // useEffect(() => {
+    //     const takeLS = () => {
+    //         const LS = JSON.parse(localStorage.getItem('consult'))
+    //         console.log(LS)
+    //     }
+    // }, [])
+
+    useEffect(() => {
+        localStorage.setItem('consult', JSON.stringify(consult))
+    }, [consult])
+
+    useEffect(() => {
+        const newsConsult = async(value) => {
+            try {
+                if(value==='') return
+                const url = `https://hn.algolia.com/api/v1/search_by_date?query=${value}&page=1`
+                
+                const { data } = await axios(url)
+                
+                setPost(data.hits)
+            } catch (error) {
+                console.log(error.message)
+            }
         }
-    }
+        newsConsult(consult)
+    }, [consult])
+    
+    useEffect(() => {
+        localStorage.setItem('likedPost', JSON.stringify(postLiked))
+    }, [postLiked])
+    
 
     const dateFormat = date => {
         const newDate = new Date(date).getTime()
@@ -35,13 +54,15 @@ const PostProvider = ({children}) => {
             return
         } else {
             setPostLiked([...postLiked, id])
+            return
         }
     }
     
     return(
         <PostContext.Provider
             value={{
-                newsConsult,
+                consult,
+                setConsult,
                 post,
                 setPost,
                 dateFormat,
