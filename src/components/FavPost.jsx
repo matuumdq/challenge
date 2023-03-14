@@ -17,7 +17,7 @@ const FavPost = () => {
                     />
                     ))}
                 </div>
-            : <p className="text-xl w-full flex justify-center my-16">Fav some post to see Here!</p>
+            : <p className="text-xl w-full flex justify-center my-16">Go fav some post to see Here!</p>
         }
     </div>
   )
