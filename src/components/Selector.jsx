@@ -1,12 +1,9 @@
-import ReactLogo from '../assets/reacticon.png'
-import AnguarLogo from '../assets/angular.png'
-import VueLogo from '../assets/vue.png'
+
 import { useState } from 'react'
 import usePost from '../hooks/usePost'
 
 const Selector = () => {
     const { setConsult, consult } = usePost()
-    // <img src={ReactLogo} width={20} h={20}/>
 
   return (
         <label >

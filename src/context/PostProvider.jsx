@@ -8,6 +8,7 @@ const PostProvider = ({children}) => {
     const [post, setPost] = useState([])
     const [page, setPage] = useState(1);
     const [liked, setLiked] = useState(false)
+    const [loading, setLoading] = useState(false)
     const [postLiked, setPostLiked] = useState(JSON.parse(localStorage.getItem('likedPost')) || [])
     const [consult, setConsult] = useState(JSON.parse(localStorage.getItem('consult')) || '')
     const [onFav, setOnFav] = useState(JSON.parse(localStorage.getItem('favPost')) || [])
@@ -17,18 +18,60 @@ const PostProvider = ({children}) => {
     }, [consult])
 
     useEffect(() => {
+        if(page!==1){
+            const pagination = async() => {
+                setLoading(true)
+                try {
+                    const url = `https://hn.algolia.com/api/v1/search_by_date?query=${consult}&page=${page}`
+                    const { data } = await axios(url)
+                    setPost([...post, ...data.hits])
+                } catch (error) {
+                    console.log(error)
+                }
+                finally {
+                    setLoading(false)
+                }
+            }
+            pagination()
+        }
+    },[page])
+
+    useEffect(() => {
         const newsConsult = async(value) => {
+            setPage(1)
+            setPost([])
+            setLoading(true)
             try {
                 if(value==='') return
-                const url = `https://hn.algolia.com/api/v1/search_by_date?query=${value}&page=${page}`
+                const url = `https://hn.algolia.com/api/v1/search_by_date?query=${value}&page=1`
                 const { data } = await axios(url)
                 setPost(data.hits)
             } catch (error) {
                 console.log(error.message)
             }
+            finally {
+                setLoading(false)
+            }
         }
         newsConsult(consult)
     }, [consult])
+
+    useEffect(() => {
+        window.addEventListener('scroll', handleScroll);
+        return () => window.removeEventListener('scroll', handleScroll);
+      }, []);
+
+    const handleScroll = () => {
+        const windowHeight = window.innerHeight;
+        const scrollTop = document.documentElement.scrollTop;
+        const scrollHeight = document.documentElement.scrollHeight;
+    
+        if (scrollTop + windowHeight >= scrollHeight) {
+          setPage(prevPage => prevPage + 1);
+        }
+    };
+
+    
 
     
     useEffect(() => {
@@ -66,7 +109,8 @@ const PostProvider = ({children}) => {
                 setLiked,
                 likedPost,
                 postLiked,
-                onFav
+                onFav,
+                loading
 			}}
         >
             {children}
