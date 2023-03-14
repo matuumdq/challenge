@@ -29,7 +29,7 @@ const PostProvider = ({children}) => {
                     console.log(error)
                 }
                 finally {
-                    setLoading(false)
+                    setLoading(false.message)
                 }
             }
             pagination()
@@ -65,25 +65,15 @@ const PostProvider = ({children}) => {
         const windowHeight = window.innerHeight;
         const scrollTop = document.documentElement.scrollTop;
         const scrollHeight = document.documentElement.scrollHeight;
-    
         if (scrollTop + windowHeight >= scrollHeight) {
           setPage(prevPage => prevPage + 1);
         }
     };
-
-    
-
     
     useEffect(() => {
         localStorage.setItem('likedPost', JSON.stringify(postLiked))
         localStorage.setItem('favPost', JSON.stringify(onFav))
     }, [postLiked])
-
-    const dateFormat = date => {
-        const newDate = new Date(date).getTime()
-        const dateTot = Date.now()
-        return(Math.abs((dateTot - newDate) / 36e5).toFixed(0))
-    }
 
     const likedPost = (item) => {
         if(postLiked.includes(item[0].objectID)){
@@ -95,6 +85,12 @@ const PostProvider = ({children}) => {
             setOnFav([...onFav, item])
             return
         }
+    }
+
+    const dateFormat = date => {
+        const newDate = new Date(date).getTime()
+        const dateTot = Date.now()
+        return(Math.abs((dateTot - newDate) / 36e5).toFixed(0))
     }
     
     return(
