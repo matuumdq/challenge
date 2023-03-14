@@ -6,16 +6,11 @@ const PostContext = createContext()
 const PostProvider = ({children}) => {
 
     const [post, setPost] = useState([])
+    const [page, setPage] = useState(1);
     const [liked, setLiked] = useState(false)
     const [postLiked, setPostLiked] = useState(JSON.parse(localStorage.getItem('likedPost')) || [])
     const [consult, setConsult] = useState(JSON.parse(localStorage.getItem('consult')) || '')
-
-    // useEffect(() => {
-    //     const takeLS = () => {
-    //         const LS = JSON.parse(localStorage.getItem('consult'))
-    //         console.log(LS)
-    //     }
-    // }, [])
+    const [onFav, setOnFav] = useState(JSON.parse(localStorage.getItem('favPost')) || [])
 
     useEffect(() => {
         localStorage.setItem('consult', JSON.stringify(consult))
@@ -25,10 +20,8 @@ const PostProvider = ({children}) => {
         const newsConsult = async(value) => {
             try {
                 if(value==='') return
-                const url = `https://hn.algolia.com/api/v1/search_by_date?query=${value}&page=1`
-                
+                const url = `https://hn.algolia.com/api/v1/search_by_date?query=${value}&page=${page}`
                 const { data } = await axios(url)
-                
                 setPost(data.hits)
             } catch (error) {
                 console.log(error.message)
@@ -36,11 +29,12 @@ const PostProvider = ({children}) => {
         }
         newsConsult(consult)
     }, [consult])
+
     
     useEffect(() => {
         localStorage.setItem('likedPost', JSON.stringify(postLiked))
+        localStorage.setItem('favPost', JSON.stringify(onFav))
     }, [postLiked])
-    
 
     const dateFormat = date => {
         const newDate = new Date(date).getTime()
@@ -48,12 +42,14 @@ const PostProvider = ({children}) => {
         return(Math.abs((dateTot - newDate) / 36e5).toFixed(0))
     }
 
-    const likedPost = (id) => {
-        if(postLiked.includes(id)){
-            setPostLiked(postLiked.filter(item => item !== id))
+    const likedPost = (item) => {
+        if(postLiked.includes(item[0].objectID)){
+            setPostLiked(postLiked.filter(post => post !== item[0].objectID))
+            setOnFav(onFav.filter(post => post[0].objectID !== item[0].objectID ))
             return
         } else {
-            setPostLiked([...postLiked, id])
+            setPostLiked([...postLiked, item[0].objectID])
+            setOnFav([...onFav, item])
             return
         }
     }
@@ -69,7 +65,8 @@ const PostProvider = ({children}) => {
                 liked,
                 setLiked,
                 likedPost,
-                postLiked
+                postLiked,
+                onFav
 			}}
         >
             {children}

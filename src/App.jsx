@@ -1,4 +1,5 @@
 import { useState } from "react"
+import FavPost from "./components/FavPost"
 import PostContainer from "./components/PostContainer"
 import Selector from "./components/Selector"
 import { PostProvider } from "./context/PostProvider"
@@ -30,7 +31,7 @@ function App() {
                     <Selector setSelector/>
                     <PostContainer />
                 </>
-            : <><h1>Hi</h1></>
+            : <FavPost />
             }
         </PostProvider>
     )
