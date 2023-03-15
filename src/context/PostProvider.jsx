@@ -6,7 +6,7 @@ const PostContext = createContext()
 const PostProvider = ({children}) => {
 
     const [post, setPost] = useState([])
-    const [page, setPage] = useState(1);
+    const [page, setPage] = useState(0);
     const [liked, setLiked] = useState(false)
     const [loading, setLoading] = useState(false)
     const [postLiked, setPostLiked] = useState(JSON.parse(localStorage.getItem('likedPost')) || [])
@@ -38,13 +38,15 @@ const PostProvider = ({children}) => {
 
     useEffect(() => {
         const newsConsult = async(value) => {
-            setPage(1)
+            setPage(0)
             setPost([])
             setLoading(true)
             try {
                 if(value==='') return
-                const url = `https://hn.algolia.com/api/v1/search_by_date?query=${value}&page=1`
+                const url = `https://hn.algolia.com/api/v1/search_by_date?query=${value}&page=${page}`
                 const { data } = await axios(url)
+                console.log(data)
+                console.log(url)
                 setPost(data.hits)
             } catch (error) {
                 console.log(error.message)
