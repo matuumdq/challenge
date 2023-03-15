@@ -7,7 +7,7 @@ const PostContainer = () => {
     const { post, loading } = usePost()
     return (
         <>
-            <div className='grid lg:grid-cols-2 w-full gap-4 ml-4'> 
+            <div className='grid lg:grid-cols-2 w-full gap-4'> 
             
                 {post.map((item) => (
                     <Post 
